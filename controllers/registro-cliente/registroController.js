@@ -4,7 +4,7 @@ import { generarJWT } from '../../helpers/generar-jwt.js';
 import nodemailer  from 'nodemailer'
 import bcryptjs from "bcryptjs"
 import crypto from 'crypto'
-import envio from './envioClienteVeri.js'
+import envio from '../logica-email/envioClienteVeri.js'
 const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
 
 const validarDominio = (correo) => {
@@ -21,7 +21,7 @@ var registrousu = {
     
             try {
                 // Define el filtro para incluir solo USUARIO y ADMINISTRADOR
-                const query = { rol: { $in: ['USUARIO', 'ADMINISTRADOR'] } };
+                const query = { rol: { $in: ['CLIENTE', 'ADMINISTRADOR'] } };
     
                 // Obtiene todos los registros que cumplen con el filtro
                 const registr = await Regis.find(query);
@@ -52,6 +52,7 @@ var registrousu = {
                 }
         
                 const tokenVerificacion = crypto.randomBytes(32).toString('hex');
+                
 
                 const registro = new Regis({
                 

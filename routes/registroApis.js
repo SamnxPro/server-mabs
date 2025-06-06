@@ -3,8 +3,8 @@ import { check } from 'express-validator';
 import validarCampos from '../middlewares/validar.campos.js';
 import { esRoleValido } from '../helpers/db-validator.js'
 import registroClientes from '../controllers/registro-cliente/registroController.js' 
-import verficacionTokens from '../controllers/registro-cliente/verificacionTokenRgis.js'
-
+import verficacionTokens from '../controllers/verificarToken/verificacionTokenRgis.js'
+import { esCorreoValido } from '../helpers/db-validator.js';
 
 
 
@@ -30,7 +30,21 @@ router.post('/registro',[
     check('nombre_cliente', 'El nombre cliente es obligatoria').not().isEmpty(),
     check('apellido', 'El apellido es obligatorio').not().isEmpty(),
     check('correo', 'correo no es valido').isEmail(),
-    //check('correo', ).custom(emailExiste),
+    check('correo', ).custom(esCorreoValido),
+    check('password', 'contraseña no es valido').isLength({ min: 6}),
+    check('telefono', ' El telefono es obligatorio').not().isEmpty(),
+    //check('rol', 'No es un rol valido').isIn(['ADMIN_ROLE', 'USER_ROLE']),
+    check('rol', ).custom( esRoleValido),
+    validarCampos,
+], registroClientes.guardarRegistro)
+
+router.put('/inactivousuario/:id',[
+    //validacion de campos
+
+    check('nombre_cliente', 'El nombre cliente es obligatoria').not().isEmpty(),
+    check('apellido', 'El apellido es obligatorio').not().isEmpty(),
+    check('correo', 'correo no es valido').isEmail(),
+    check('correo', ).custom(esCorreoValido),
     check('password', 'contraseña no es valido').isLength({ min: 6}),
     check('telefono', ' El telefono es obligatorio').not().isEmpty(),
     //check('rol', 'No es un rol valido').isIn(['ADMIN_ROLE', 'USER_ROLE']),

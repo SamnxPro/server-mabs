@@ -1,10 +1,6 @@
 import { response } from 'express';
 import Regis from '../../models/RegistroClientes/regisClientes.js';
 
-
-import bcryptjs from "bcryptjs"
-import crypto from 'crypto'
-
 var registrousu = {
 
             verificarCorreo: async (req,res) => {
