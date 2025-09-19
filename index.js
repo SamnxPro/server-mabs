@@ -6,6 +6,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
 import router from './routes/registroApis.js'
+import referidoApis from './routes/referidoApis.js'
 import dot from 'dotenv'
 import fileUpload from 'express-fileupload'
 
@@ -42,7 +43,13 @@ app.use(cors())
 app.use(morgan('dev'))
 app.use(bodyParser.urlencoded({ extended: false}))
 app.use(bodyParser.json())
+
+
+//apis - rutas
 app.use('/api', router)
+
+app.use('/api/referido', referidoApis)
+
 
 
 

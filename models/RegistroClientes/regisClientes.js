@@ -86,6 +86,13 @@ const RegisUsuSchema = new Schema({
     tokenVerificacion: String,
     tokenRecuperacion: String,
 
+    referido: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'refeClient',
+    default: null
+    }
+
+
 });
 
 RegisUsuSchema.methods.toJSON = function () {

@@ -8,6 +8,12 @@ export  async function esRoleValido(rol = '') {
         throw new Error(`El rol  no está registrado en la base de datos`);
     }
 }
+export  async function rolAdmin(rol = 'ADMINISTADOR') {
+    const existeRole = await Role.findOne({ rol });
+    if (!existeRole) {
+        throw new Error(`El rol  no está registrado en la base de datos`);
+    }
+}
 export async function esCorreoValido(correo = '') {
     // Verificar si el correo ya existe en la base de datos
     const existeCorreo = await Regis.findOne({ correo });

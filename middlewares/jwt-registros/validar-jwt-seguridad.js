@@ -1,9 +1,10 @@
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
-import registroAu from '../models/RegistroClientes/regisClientes.js';
+import registroAu from '../../models/RegistroClientes/regisClientes.js';
 
 const validarJWT = async (req, res, next) => {
   const token = req.header('metasploit');
+  
   if (!token) {
     return res.status(401).json({
       msg: 'No hay token en la petición',

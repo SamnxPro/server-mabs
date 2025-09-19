@@ -4,10 +4,6 @@ import { generarJWT } from '../../helpers/generar-jwt-registros/generar-jwt.js';
 import nodemailer  from 'nodemailer'
 import bcryptjs from "bcryptjs";
 import crypto from 'crypto';
-import envio from '../logica-email/envioClienteVeri.js'
-import regisClientes from '../../models/RegistroClientes/regisClientes.js';
-import RegistrarRelacionReferido from '../../controllers/arbol de referidos/referidosControllers.js'
-
 
 const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
 
@@ -20,7 +16,7 @@ const validarDominio = (correo) => {
 
 
   
-var registrousu = {
+var registroPro = {
     
      listar: async (req, res) => {
     
@@ -117,4 +113,4 @@ var registrousu = {
 
     };
 
-export default registrousu;
+export default registroPro;

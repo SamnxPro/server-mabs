@@ -4,35 +4,37 @@ import moment from "moment-timezone";
 
 const Schema = mongoose.Schema;
 
-const RegisUsuSchema = new Schema({
+const RefeUsuSchema = new Schema({
 
     usuarioId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:'RegisUsu'
     },
-        refererId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref:'RegisUsu'
-    },
     referralDate: { 
         type: Date,
-        default: Date.now 
+        default: () => moment().tz('America/Bogota').toDate()
     },
 
     commissionLevel: { 
-        type: Number ,
-         default: 0
-    }  // Nivel de la comisión (Gen0, Gen1, etc.)
+        type: mongoose.Schema.Types.ObjectId,
+        ref:'NvlRefe'
+    },  // Nivel de la comisión (Gen0, Gen1, etc.)
     
+    estado: {
+        type: Boolean,
+         default: false
+    },
+
+    tokenVerificacionReferido: String,
 
 });
 
-RegisUsuSchema.methods.toJSON = function () {
-    const { __v, password, _id, ...RegisUsu } = this.toObject();
-    RegisUsu.iud = _id;
-    return RegisUsu;
+RefeUsuSchema.methods.toJSON = function () {
+    const { __v, password, _id, ...refeClient } = this.toObject();
+    refeClient.iud = _id;
+    return refeClient;
   };
   
-export default mongoose.model('refeClient', RegisUsuSchema);
+export default mongoose.model('refeClient', RefeUsuSchema);
 
 
