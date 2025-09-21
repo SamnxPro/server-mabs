@@ -5,8 +5,9 @@ import http from 'http'
 import cors from 'cors'
 import mongoose from 'mongoose'
 import bodyParser from 'body-parser'
-import router from './routes/registroApis.js'
-import referidoApis from './routes/referidoApis.js'
+import router from './routes/Registro/registroApis.js'
+import login from './routes/login/InicioSesion.js';
+import referidoApis from './routes/arbol-referidos/referidoApis.js'
 import dot from 'dotenv'
 import fileUpload from 'express-fileupload'
 
@@ -49,7 +50,7 @@ app.use(bodyParser.json())
 app.use('/api', router)
 
 app.use('/api/referido', referidoApis)
-
+app.use('/api/login', login)
 
 
 

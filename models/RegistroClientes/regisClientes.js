@@ -8,7 +8,7 @@ const RegisUsuSchema = new Schema({
 
     nombre_cliente: {
         type: String,
-        required: [true, 'El nombre es obligatorio']
+        required: [true, 'El nombre_cliente es obligatorio']
     },
     
     apellido: {
@@ -28,10 +28,6 @@ const RegisUsuSchema = new Schema({
     imagenes: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'imgPerfil'
-    },
-    password: {
-        type: String,
-        required: [true, 'La contraseña es obligatoria']
     },
     telefono: {
         type: Number,
@@ -89,7 +85,6 @@ const RegisUsuSchema = new Schema({
     referido: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'refeClient',
-    default: null
     }
 
 

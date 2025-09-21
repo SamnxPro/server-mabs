@@ -1,11 +1,11 @@
 import express from 'express';
 import { check } from 'express-validator';
-import validarCampos from '../middlewares/validar.campos.js';
-import { esRoleValido, rolAdmin } from '../helpers/db-validator.js'
-import registroClientes from '../controllers/registro-cliente/registroController.js' 
-import verficacionTokens from '../controllers/verificarToken/verificacionTokenRgis.js'
-import { esCorreoValido } from '../helpers/db-validator.js';
-import validarJWT from '../middlewares/jwt-registros/validar-jwt-seguridad.js';
+import validarCampos from '../../middlewares/validar.campos.js';
+import { esRoleValido, rolAdmin } from '../../helpers/db-validator.js'
+import registroClientes from '../../controllers/registro-cliente/registroController.js' 
+import verficacionTokens from '../../controllers/verificarToken/verificacionTokenRgis.js'
+import { esCorreoValido } from '../../helpers/db-validator.js';
+import validarJWT from '../../middlewares/jwt-registros/validar-jwt-seguridad.js';
 
 
 

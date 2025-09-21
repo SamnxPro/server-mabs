@@ -5,7 +5,6 @@ import nodemailer  from 'nodemailer'
 import bcryptjs from "bcryptjs";
 import crypto from 'crypto';
 import envio from '../logica-email/envioClienteVeri.js'
-import regisClientes from '../../models/RegistroClientes/regisClientes.js';
 import RegistrarRelacionReferido from '../../controllers/arbol de referidos/referidosControllers.js'
 
 
@@ -59,7 +58,7 @@ var registrousu = {
 
                 // Token de verificación
                 const tokenVerificacion = crypto.randomBytes(32).toString('hex');
-
+            
                 // Crear instancia del usuario
                 const registro = new Regis({
                 nombre_cliente: params.nombre_cliente,
@@ -72,6 +71,7 @@ var registrousu = {
                 refererId: params.usuarioId,
                 tokenVerificacion
                 });
+               
 
                 // Encriptar contraseña
                 const salt = bcryptjs.genSaltSync(10);
@@ -79,14 +79,12 @@ var registrousu = {
 
                 // Guardar usuario en BD
                 const guardarApi = await registro.save();
+                
 
                 // Si viene refererId válido, registrar relación
                 if (params.usuarioId && mongoose.Types.ObjectId.isValid(params.usuarioId)) {
                 await RegistrarRelacionReferido(guardarApi._id, params.usuarioId);
                 }
-
-                // Generar token JWT
-                const token = await generarJWT(guardarApi.id);
 
                 // URL de verificación
                 const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
@@ -104,7 +102,7 @@ var registrousu = {
                 res.status(200).json({
                 msg: 'Registro Exitoso. Se ha enviado un correo electrónico de verificación.',
                 guardarApi,
-                token
+                
                 });
 
             } catch (error) {
