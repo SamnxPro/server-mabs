@@ -10,10 +10,14 @@ const ContadorSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "RegisUsu",
         required: true,
-        unique: true
+    },
+    usuarioRefeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "refeClient",
+        required: true,
     },
 
-    totalComissiones: {
+    montoFactu: {
         type: Number,
         default: 0
     },

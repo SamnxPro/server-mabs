@@ -1,39 +1,51 @@
 import mongoose from 'mongoose';
-import RefeUsu from '../../models/Referidos/referidosClients.js';
+import ContadorRefe from '../../models/Referidos/nivelReferido.js';
 import crypto from 'crypto';
 
 var NvlReferidos = {
 
 
 
-generarEnlaceReferido: async (req, res) => {
-try {
-    let nivel = 0;
-    let usuarioActual = await refere.findById(usuarioId).populate("usuarioId");
+guardarNivelesyGeneracion: async (req, res) => {
+ try {
+    // Buscar el último nivel creado (orden descendente)
+    const ultimoNivel = await ContadorRefe.findOne().sort({ GeneracionLevel: -1 });
 
-    // Recorremos hacia arriba
-    while (usuarioActual && nivel <= 3) {
-      const porcentaje = porcentajes[nivel] || 0;
-      const comision = (montoBase * porcentaje) / 100;
+    let nuevoNivel;
+    if (!ultimoNivel) {
+      // Si no existe ningún nivel → comenzamos con Gen0 (25%)
+      nuevoNivel = new ContadorRefe({
+        NombreLevel: "Gen0",
+        GeneracionLevel: 0,
+        porcentaje: 25,
+      });
+    } else {
+      // Si ya hay niveles → incrementamos commissionLevel
+      const siguienteNivel = ultimoNivel.GeneracionLevel + 1;
 
-      if (usuarioActual.usuarioId) {
-        // Sumar comisión al usuario dueño
-        await refere.findByIdAndUpdate(
-          usuarioActual.usuarioId._id,
-          { $inc: { comisionesAcumuladas: comision } },
-          { new: true }
-        );
-      }
-
-      // Subir al padre (el que lo refirió)
-      usuarioActual = await refere.findOne({ usuarioId: usuarioActual.usuarioId });
-      nivel++;
+      nuevoNivel = new ContadorRefe({
+        NombreLevel: `Gen${siguienteNivel}`,
+        GeneracionLevel: siguienteNivel,
+        porcentaje: 5, // A partir de Gen1 es siempre 5%
+      });
     }
 
+    // Guardamos en BD
+    await nuevoNivel.save();
+
+    res.status(201).json({
+      ok: true,
+      msg: "Nivel creado correctamente",
+      data: nuevoNivel,
+    });
   } catch (error) {
-    console.error("Error asignando comisiones:", error);
+    console.error("Error al crear nivel:", error);
+    res.status(500).json({
+      ok: false,
+      msg: "Error en el servidor",
+    });
   }
-},
+}
   
 
 
@@ -41,4 +53,4 @@ try {
 
 
 }
-export default ContadorReferidos;
+export default NvlReferidos;

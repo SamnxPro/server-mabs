@@ -10,7 +10,7 @@ const NvlRefSchema = new Schema({
         type: String,
     },
 
-    commissionLevel: {
+    GeneracionLevel: {
         type: Number,
         default: 0
     },  // Nivel de la comisión (Gen0, Gen1, etc.)

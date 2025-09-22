@@ -48,7 +48,7 @@ var referidoToken = {
                 verificado: false,
                 tokenVerificacion
             });
-
+            
             // 5. Enviar correo de verificación
             const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
             const mailOptions = {
@@ -73,7 +73,6 @@ var referidoToken = {
             return res.status(500).json({ error: "Error en la verificación del referido" });
         }
     },
-
 }
 
 export default referidoToken;

@@ -115,7 +115,7 @@ var loginUsu = {
                     msg: 'no se encontro un registro'
                 })
 
-                if (auten.rol !== 'ADMINISTRADOR_ROLE') {
+                if (auten.rol !== 'DIOS') {
                     return res.status(400).json({
                         msg: 'No tienes permisos de administrador'
                     });
