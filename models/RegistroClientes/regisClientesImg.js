@@ -20,6 +20,11 @@ const ImgPerfilSchema = new Schema({
         type: Number,
         required: true,
       },
+      usuario: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RegisUsu', // Nombre de tu modelo de usuarios
+        required: true
+    }
 });
 
 ImgPerfilSchema.methods.toJSON = function () {

@@ -34,8 +34,7 @@ const io = new Socketserver(server,{
 
 //conexion de middlewares
 app.use(fileUpload({
-    useTempFiles : true,
-    tempFileDir : '/tmp/',
+    useTempFiles : false,
     createParentPath: true
 
 }));

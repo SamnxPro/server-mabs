@@ -25,7 +25,7 @@ const RegisUsuSchema = new Schema({
         required: [true, 'El correo es obligatorio'],
         unique: true
     },
-    imagenes: {
+    img: {
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'imgPerfil'
     },

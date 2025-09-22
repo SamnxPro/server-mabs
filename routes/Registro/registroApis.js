@@ -6,7 +6,8 @@ import registroClientes from '../../controllers/registro-cliente/registroControl
 import verficacionTokens from '../../controllers/verificarToken/verificacionTokenRgis.js'
 import { esCorreoValido } from '../../helpers/db-validator.js';
 import validarJWT from '../../middlewares/jwt-registros/validar-jwt-seguridad.js';
-
+import validarArchivosSubir from '../../middlewares/validar-archivos.js';
+import imgPerfil from '../../controllers/registro-cliente/ImagenesController.js';
 
 
 
@@ -53,6 +54,12 @@ router.put('/inactivousuario/:id',[
     validarCampos,
     validarJWT
 ], registroClientes.guardarRegistro)
+
+
+router.post('/imgPerfil/:id',[
+    validarArchivosSubir,
+    validarJWT
+], imgPerfil.guardarImgPerfil)
 
 
 
