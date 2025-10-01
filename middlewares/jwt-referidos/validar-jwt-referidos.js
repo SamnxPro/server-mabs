@@ -1,65 +1,54 @@
-import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
-import refered from '../../models/Referidos/referidosClients'
+import refered from '../../models/Referidos/referidosClients.js';
 
-const validarJwtReferidos= async (req, res, next) => {
-  const token = req.header('plot');
-  
+const validarJwtReferidos = async (req, res, next) => {
+  const token = req.header('plot'); 
+
   if (!token) {
-    return res.status(401).json({
-      msg: 'No hay token en la petición',
-    });
+    return res.status(401).json({ msg: 'No hay token en la petición' });
   }
 
   try {
-    // Asegúrate de que SECRETKEY tenga al menos 32 caracteres
-    const secretKey = process.env.SECRETKEYREF.padEnd(32, '0').substring(0, 32); // Asegurar que tenga 32 caracteres
-    const iv = secretKey.substring(0, 16); // Los primeros 16 caracteres de la SECRETKEY se usarán como IV
+    // Claves para desencriptar
+    const secretKey = process.env.SECRETKEYREF.padEnd(32, '0').substring(0, 32);
+    const iv = secretKey.substring(0, 16);
 
-    console.log("Token recibido (cifrado):", token);
-
-    // **1. Desencriptar el token**
+    // 1. Desencriptar
     const decipher = crypto.createDecipheriv(
       'aes-256-cbc',
-      Buffer.from(secretKey, 'utf8'), // Clave de cifrado derivada de SECRETKEY
-      Buffer.from(iv, 'utf8') // IV derivado de la misma SECRETKEY
+      Buffer.from(secretKey, 'utf8'),
+      Buffer.from(iv, 'utf8')
     );
-
     let decryptedToken = decipher.update(token, 'hex', 'utf8');
     decryptedToken += decipher.final('utf8');
 
-    console.log("JWT desencriptado:", decryptedToken);
+    // 2. Verificar JWT (firmado con SECRETKEY normal, no con SECRETKEYREF)
+    const payload = jwt.verify(decryptedToken, process.env.SECRETKEY);
 
-    // **2. Verificar el JWT**
-    const { uid } = jwt.verify(decryptedToken, process.env.SECRETKEYREF);
-    console.log("Payload JWT verificado:", uid);
+    // 3. Buscar la relación en la BD
+    const relacion = await refered.findOne({
+      tokenVerificacionReferido: payload.refTok,
+      estado: false
+    }).populate("usuarioId", "nombre_cliente correo estado");
 
-    // **3. Validar si el UID existe en la base de datos**
-    const registrosUsu = await refered.findById(uid);
-
-    if (!registrosUsu) {
-      return res.status(401).json({
-        msg: 'Token no válido - Usuario no existe',
-      });
+    if (!relacion) {
+      return res.status(401).json({ msg: 'Token no válido o relación no encontrada' });
     }
 
-    // **4. Verificar si el usuario está activo**
-    if (!registrosUsu.estado) {
-      return res.status(401).json({
-        msg: 'Token no válido - Usuario inactivo',
-      });
+    // 4. Validar si el usuario que invita está activo
+    if (!relacion.usuarioId.estado) {
+      return res.status(401).json({ msg: 'El usuario que generó el enlace está inactivo' });
     }
 
-    // **5. Agregar los datos del usuario a la solicitud**
-    req.registrosUsu = registrosUsu;
+    // 5. Exponer en req la relación de referido
+    req.referidoRelacion = relacion;
     next();
 
   } catch (error) {
-    console.error("Error en la validación del token:", error.message);
-    res.status(401).json({
-      msg: 'Token no válido',
-    });
+    console.error("Error en la validación del token de referido:", error.message);
+    res.status(401).json({ msg: 'Token de invitación no válido' });
   }
 };
 
-export default validarJwtReferidos
+export default validarJwtReferidos;

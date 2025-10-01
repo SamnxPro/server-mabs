@@ -10,7 +10,7 @@ import RegistrarRelacionReferido from '../../controllers/arbol de referidos/refe
 
 const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
 
-import ArbolReferidos from '../arbol de referidos/referidosControllers.js'
+
 
 const validarDominio = (correo) => {
     const dominio = correo.split('@')[1];
@@ -49,17 +49,17 @@ var registrousu = {
         try {
             const params = req.body;
 
-            // Validar dominio
+            // 1. Validar dominio
             if (!validarDominio(params.correo)) {
                 return res.status(400).json({
                     msg: 'Correo electrónico inválido. Debe ser de uno de los siguientes dominios: @hotmail.com, @gmail.com, @yahoo.com'
                 });
             }
 
-            // Token de verificación
+            // 2. Token de verificación
             const tokenVerificacion = crypto.randomBytes(32).toString('hex');
 
-            // Crear instancia del usuario
+            // 3. Crear instancia del usuario
             const registro = new Regis({
                 nombre_cliente: params.nombre_cliente,
                 apellido: params.apellido,
@@ -73,19 +73,30 @@ var registrousu = {
                 tokenVerificacion
             });
 
-
-            // Encriptar contraseña
+            // 4. Encriptar contraseña
             const salt = bcryptjs.genSaltSync(10);
             registro.password = bcryptjs.hashSync(params.password.toString(), salt);
 
-            // Guardar usuario en BD
-            const guardarApi = await registro.save();
+            let guardarApi;
 
+            try {
+                // 5. Guardar usuario en BD
+                guardarApi = await registro.save();
+            } catch (err) {
+                if (err.code === 11000) {
+                    // ⚠️ Duplicidad (correo único)
+                    return res.status(400).json({
+                        msg: "El correo ya está registrado. Intenta con otro.",
+                        error: err.keyValue
+                    });
+                }
+                throw err; // otro error inesperado
+            }
 
-            // URL de verificación
+            // 6. URL de verificación
             const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
 
-            // Enviar correo
+            // 7. Enviar correo
             const mailOptions = {
                 from: params.user,
                 to: params.correo,
@@ -95,10 +106,10 @@ var registrousu = {
 
             await envio.sendMail(mailOptions);
 
+            // 8. Respuesta final
             res.status(200).json({
                 msg: 'Registro Exitoso. Se ha enviado un correo electrónico de verificación.',
-                guardarApi,
-
+                guardarApi
             });
 
         } catch (error) {

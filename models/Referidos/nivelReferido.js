@@ -1,24 +1,11 @@
 import mongoose from "mongoose";
-import moment from "moment-timezone";
-
 
 const Schema = mongoose.Schema;
 
 const NvlRefSchema = new Schema({
-    
-    NombreLevel: {
-        type: String,
-    },
-
-    GeneracionLevel: {
-        type: Number,
-        default: 0
-    },  // Nivel de la comisión (Gen0, Gen1, etc.)
-
-    porcentaje: { type: Number, required: true } 
-
-
-
+    NombreLevel: { type: String },
+    GeneracionLevel: { type: Number, default: 0 }, 
+    porcentaje: { type: Number, required: true },
 });
 
 NvlRefSchema.methods.toJSON = function () {
@@ -26,5 +13,8 @@ NvlRefSchema.methods.toJSON = function () {
     data.iud = _id;
     return data;
 };
+
+// ✅ Índice único
+NvlRefSchema.index({ GeneracionLevel: 1 }, { unique: true });
 
 export default mongoose.model('NvlRefe', NvlRefSchema);

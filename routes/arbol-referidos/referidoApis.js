@@ -18,7 +18,7 @@ router.get('/enlace/:id/:token',[
     
 ], ArbolReferidos.generarEnlaceReferido )
 
-router.post('/enlaceVer/:id/:token',[
+router.post('/enlaceVer/:token',[
     validarJWT
 ], verficacionRef.verificarReferido )
 

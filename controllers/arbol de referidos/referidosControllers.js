@@ -2,93 +2,82 @@ import mongoose from 'mongoose';
 import Regis from '../../models/RegistroClientes/regisClientes.js';
 import RefeUsu from '../../models/Referidos/referidosClients.js';
 import crypto from 'crypto';
-import generarjwtRef from '../../helpers/generar-jwt-referidos/generar-jwt-ref.js';
+import { generarJWT } from '../../helpers/generar-jwt-registros/generar-jwt.js';
 
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL ;
 
 var ArbolReferidos = {
 
 ListarReferidos: async (req, res) => {
   try {
-    const { id } = req.params;
+    const { usuarioId } = req.params; // ID del usuario que quieres consultar
 
-    const resultado = await Regis.aggregate([
-      {
-        $match: { _id: new mongoose.Types.ObjectId(id) }
-      },
-      {
-        $graphLookup: {
-          from: 'regisusus', // nombre real de la colección en MongoDB
-          startWith: '$_id',
-          connectFromField: '_id',
-          connectToField: 'referrer',
-          as: 'referidos',
-          depthField: 'nivel'
+    const referidos = await RegisUsu.find({ referido: { $ne: null } }) // que tengan relación
+      .populate({
+        path: "referido",  // el campo de relación en RegisUsu
+        match: { 
+          usuarioId: usuarioId, // el usuario que lo refirió
+          estado: true // solo si está en true
+        },
+        populate: {
+          path: "usuarioId", // desde refeClient → usuarioId
+          select: "nombre_cliente apellido correo telefono"
         }
-      },
-      {
-        $project: {
-          nombre_cliente: 1,
-          correo: 1,
-          referidos: {
-            nombre_cliente: 1,
-            correo: 1,
-            nivel: 1
-          }
-        }
-      }
-    ]);
+      })
+      .exec();
 
     res.status(200).json({
-      msg: 'Árbol de referidos generado',
-      resultado
+      ok: true,
+      msg: "Lista de referidos activos",
+      referidos
     });
   } catch (error) {
-    console.error('Error al generar árbol de referidos:', error);
-    res.status(500).json({
-      error: 'No se pudo generar el árbol de referidos'
-    });
+    console.error("Error al listar referidos:", error);
+    res.status(500).json({ error: "Error en el servidor" });
   }
 },
 
+
+
+
 generarEnlaceReferido: async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.headers;
     const { commissionLevel } = req.params;
-    // 1. Verificar usuario que genera el enlace
+
     const usuario = await Regis.findById(id);
-    if (!usuario) {
-      return res.status(404).json({ msg: 'Usuario no encontrado' });
-    }
+    if (!usuario) return res.status(404).json({ msg: 'Usuario no encontrado' });
 
-    // 2. Generar token único
-    const token = crypto.randomBytes(32).toString("hex");
+    const nivelDoc = await NvlRefe.findOne({ GeneracionLevel: Number(commissionLevel) });
+    if (!nivelDoc) return res.status(404).json({ msg: 'Nivel de comisión no encontrado' });
 
-    // 3. Guardar relación pendiente en la colección refeClient
+    const tokenVerificacionReferido = crypto.randomBytes(18).toString("base64url");
+
     const relacion = await RefeUsu.create({
       usuarioId: usuario._id,
-      commissionLevel: commissionLevel,
+      commissionLevel: nivelDoc._id,
       estado: false,
-      tokenVerificacionReferido: token
+      tokenVerificacionReferido
     });
 
-    // 4. Construir enlace
-    const enlace = `http://localhost:8080/api/referido/enlaceVer/${usuario._id}/${token}`;
+    const payload = { refTok: tokenVerificacionReferido, level: nivelDoc.GeneracionLevel };
+    const jwtEncriptado = await generarJWT(payload);
+
+    const enlace = `${PUBLIC_BASE_URL}/api/referido/enlaceVer/${jwtEncriptado}`;
 
     res.status(200).json({
       msg: 'Enlace de invitación generado correctamente',
-      usuario: {
-        nombre: usuario.nombre_cliente,
-        correo: usuario.correo
-      },
+      usuario: { nombre: usuario.nombre_cliente, correo: usuario.correo },
+      nivel: { generacion: nivelDoc.GeneracionLevel, porcentaje: nivelDoc.porcentaje },
       enlace,
       relacion
     });
-
   } catch (error) {
     console.error('Error al generar enlace de referido:', error);
     res.status(500).json({ error: 'No se pudo generar el enlace de referido' });
   }
 },
+
   
 RegistrarRelacionReferido: async (usuarioId) => {
 

@@ -10,7 +10,7 @@ const RegisUsuSchema = new Schema({
         type: String,
         required: [true, 'El nombre_cliente es obligatorio']
     },
-    
+
     apellido: {
         type: String,
         required: [true, 'El apellido es obligatorio']
@@ -26,7 +26,7 @@ const RegisUsuSchema = new Schema({
         unique: true
     },
     img: {
-        type: mongoose.Schema.Types.ObjectId, 
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'imgPerfil'
     },
     telefono: {
@@ -43,7 +43,7 @@ const RegisUsuSchema = new Schema({
         default: 'USUARIO',
         emun: ['VENDEDOR', 'CLIENTE']
     },
-    
+
     estado: {
         type: Boolean,
         default: true
@@ -56,17 +56,17 @@ const RegisUsuSchema = new Schema({
         type: Boolean,
         default: false
     },
-    pais:{
+    pais: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Pais',
+        ref: 'Pais',
     },
-    departamento:{
+    departamento: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Depar',
+        ref: 'Depar',
     },
-    ciudad:{
+    ciudad: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:'Pais',
+        ref: 'Pais',
     },
     verificado: {
         type: Boolean,
@@ -76,15 +76,21 @@ const RegisUsuSchema = new Schema({
         type: Boolean,
         default: false
     },
-    generation: { 
+    generation: {
         type: Number,
-        default: 0 },
+        default: 0
+    },
+    reintentosVerificacion: {
+        type: Number,
+        default: 0,
+        max: 2 // opcional, pero puedes usar lógica en controlador
+    },
     tokenVerificacion: String,
     tokenRecuperacion: String,
 
     referido: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'refeClient',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'refeClient',
     }
 
 
@@ -94,6 +100,6 @@ RegisUsuSchema.methods.toJSON = function () {
     const { __v, password, _id, ...RegisUsu } = this.toObject();
     RegisUsu.iud = _id;
     return RegisUsu;
-  };
-  
+};
+
 export default mongoose.model('RegisUsu', RegisUsuSchema);

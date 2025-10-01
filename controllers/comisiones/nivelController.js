@@ -18,6 +18,7 @@ guardarNivelesyGeneracion: async (req, res) => {
         NombreLevel: "Gen0",
         GeneracionLevel: 0,
         porcentaje: 25,
+
       });
     } else {
       // Si ya hay niveles → incrementamos commissionLevel
