@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import registroAu from '../../models/RegistroClientes/regisClientes.js';
 
 const validarJWT = async (req, res, next) => {
-  const token = req.header('metasploit');
+  const token = req.header('metasploit') || req.header('Authorization')?.replace('Bearer ', '');;
   
   if (!token) {
     return res.status(401).json({
@@ -51,7 +51,7 @@ const validarJWT = async (req, res, next) => {
     }
 
     // **5. Agregar los datos del usuario a la solicitud**
-    req.registrosUsu = registrosUsu;
+    req.usuario = registrosUsu;
     next();
 
   } catch (error) {

@@ -11,7 +11,7 @@ const RefeUsuSchema = new Schema({
   tokenVerificacionReferido: { type: String, unique: true }, // ✅ Índice único
   expireAt: {
     type: Date,
-    default: () => moment().add(24, "hours").toDate(),
+    default: () => moment().add(4, "minutes").toDate(),
     index: { expireAfterSeconds: 0 }
   }
 });

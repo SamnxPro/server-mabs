@@ -17,7 +17,7 @@ guardarNivelesyGeneracion: async (req, res) => {
       nuevoNivel = new ContadorRefe({
         NombreLevel: "Gen0",
         GeneracionLevel: 0,
-        porcentaje: 25,
+        porcentaje: 0.5,
 
       });
     } else {
@@ -27,7 +27,7 @@ guardarNivelesyGeneracion: async (req, res) => {
       nuevoNivel = new ContadorRefe({
         NombreLevel: `Gen${siguienteNivel}`,
         GeneracionLevel: siguienteNivel,
-        porcentaje: 5, // A partir de Gen1 es siempre 5%
+        porcentaje: 0.05, // A partir de Gen1 es siempre 5%
       });
     }
 

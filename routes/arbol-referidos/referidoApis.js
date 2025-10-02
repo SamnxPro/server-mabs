@@ -9,17 +9,18 @@ import ArbolReferidos from '../../controllers/arbol de referidos/referidosContro
 import verficacionRef from '../../controllers/verificarToken/verificacionTokenRefer.js';
 import validarJWT from '../../middlewares/jwt-registros/validar-jwt-seguridad.js';
 import NvlController from '../../controllers/comisiones/nivelController.js'
+import validarJwtReferidos from '../../middlewares/jwt-referidos/validar-jwt-referidos.js';
 
 
 var router = express.Router()
 
-router.get('/enlace/:id/:token',[
+router.get('/enlace/:commissionLevel',[
     validarJWT
     
 ], ArbolReferidos.generarEnlaceReferido )
 
 router.post('/enlaceVer/:token',[
-    validarJWT
+    validarJwtReferidos
 ], verficacionRef.verificarReferido )
 
 

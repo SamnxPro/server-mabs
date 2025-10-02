@@ -3,14 +3,13 @@ import crypto from 'crypto';
 import refered from '../../models/Referidos/referidosClients.js';
 
 const validarJwtReferidos = async (req, res, next) => {
-  const token = req.header('plot'); 
+  const token = req.params.token;
 
   if (!token) {
     return res.status(401).json({ msg: 'No hay token en la petición' });
   }
 
   try {
-    // Claves para desencriptar
     const secretKey = process.env.SECRETKEYREF.padEnd(32, '0').substring(0, 32);
     const iv = secretKey.substring(0, 16);
 
@@ -20,33 +19,43 @@ const validarJwtReferidos = async (req, res, next) => {
       Buffer.from(secretKey, 'utf8'),
       Buffer.from(iv, 'utf8')
     );
+
     let decryptedToken = decipher.update(token, 'hex', 'utf8');
     decryptedToken += decipher.final('utf8');
 
-    // 2. Verificar JWT (firmado con SECRETKEY normal, no con SECRETKEYREF)
-    const payload = jwt.verify(decryptedToken, process.env.SECRETKEY);
+    // 2. Verificar JWT
+    const payload = jwt.verify(decryptedToken, process.env.SECRETKEYREF);
+    console.log("✅ Payload desencriptado:", payload);
 
-    // 3. Buscar la relación en la BD
+    // 3. Buscar la relación en BD
+    console.log("🔍 Buscando relación con:", {
+      refTok: payload.refTok,
+      parentId: payload.parentId
+    });
+
     const relacion = await refered.findOne({
       tokenVerificacionReferido: payload.refTok,
+      usuarioId: payload.parentId,
       estado: false
     }).populate("usuarioId", "nombre_cliente correo estado");
+
+    console.log("📌 Relación encontrada:", relacion);
 
     if (!relacion) {
       return res.status(401).json({ msg: 'Token no válido o relación no encontrada' });
     }
 
-    // 4. Validar si el usuario que invita está activo
     if (!relacion.usuarioId.estado) {
       return res.status(401).json({ msg: 'El usuario que generó el enlace está inactivo' });
     }
 
-    // 5. Exponer en req la relación de referido
     req.referidoRelacion = relacion;
+    req.payloadRef = payload;
+
     next();
 
   } catch (error) {
-    console.error("Error en la validación del token de referido:", error.message);
+    console.error("❌ Error en la validación del token de referido:", error.message);
     res.status(401).json({ msg: 'Token de invitación no válido' });
   }
 };
