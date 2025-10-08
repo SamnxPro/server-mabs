@@ -23,7 +23,11 @@ const RegisUsuSchema = new Schema({
     correo: {
         type: String,
         required: [true, 'El correo es obligatorio'],
-        unique: true
+        unique: true,
+        validate: {
+            validator: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+            message: props => `${props.value} no es un correo válido`
+        }
     },
     img: {
         type: mongoose.Schema.Types.ObjectId,
@@ -91,9 +95,31 @@ const RegisUsuSchema = new Schema({
     referido: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'refeClient',
+    },
+    codigoReferido: {
+        type: String,
+        unique: true,
+        sparse: true,       // permite múltiples documentos sin código
+        uppercase: true,
+        trim: true,
+        default: null,      // de
+    },
+
+
+    expireAt: {
+        type: Date,
+        default: () => moment().add(24, "hours").toDate(), // 24 horas
+        index: { expires: 0 } // TTL: cuando llegue la fecha se elimina automático
     }
 
 
+});
+
+RegisUsuSchema.pre("save", function (next) {
+    if (this.verificado === true) {
+        this.expireAt = undefined; // ✅ simplemente anulas el campo
+    }
+    next();
 });
 
 RegisUsuSchema.methods.toJSON = function () {

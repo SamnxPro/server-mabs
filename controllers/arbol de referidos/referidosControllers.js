@@ -40,46 +40,55 @@ var ArbolReferidos = {
 
   generarEnlaceReferido: async (req, res) => {
     try {
-      const padreId = req.usuario._id; // viene del JWT padre
+      const padreId = req.usuario._id;
       const { commissionLevel } = req.params;
 
-      const nivelDoc = await NvlReferidos.findOne({ GeneracionLevel: Number(commissionLevel)-1 });
+      const nivelDoc = await NvlReferidos.findOne({ GeneracionLevel: Number(commissionLevel) - 1 });
       if (!nivelDoc) {
-        return res.status(404).json({ msg: 'Nivel de comisión no encontrado' });
+        return res.status(404).json({ msg: "Nivel de comisión no encontrado" });
       }
 
-      // token de verificación único
       const tokenVerificacionReferido = crypto.randomBytes(18).toString("base64url");
+      let jwtRef = null;
 
-      // guardar relación
+      try {
+        jwtRef = generarJWTrRef(padreId, tokenVerificacionReferido);
+      } catch (err) {
+        console.warn("⚠️ No se pudo generar JWTRef, se usará solo código:", err.message);
+      }
+
+      const codigoReferido = `MABS-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
+
       const relacion = await RefeUsu.create({
         usuarioId: padreId,
         commissionLevel: nivelDoc._id,
         estado: false,
-        tokenVerificacionReferido
+        tokenVerificacionReferido,
+        jwtRef,
+        codigoReferido,
       });
 
-      const jwtRef = await generarJWTrRef(padreId, tokenVerificacionReferido);
-
-      // enlace final
-      const enlace = `${process.env.PUBLIC_BASE_URL}/api/referido/enlaceVer/${jwtRef}`;
-
-      return res.status(200).json({
-        msg: 'Enlace de invitación generado correctamente',
+      const respuesta = {
+        msg: "Código o enlace de referido generado correctamente",
+        codigoReferido,
         usuario: { id: padreId },
         nivel: { generacion: nivelDoc.GeneracionLevel, porcentaje: nivelDoc.porcentaje },
-        enlace,
-        relacion, 
-        jwtRef
-      });
+      };
 
+      if (jwtRef) {
+        respuesta.enlace = `${process.env.PUBLIC_BASE_URL}/api/referido/enlaceVer/${jwtRef}`;
+      } else {
+        respuesta.advertencia = "⚠️ No se generó enlace seguro. Usa el código manualmente.";
+      }
+
+      return res.status(200).json(respuesta);
     } catch (error) {
       console.error("Error en generarEnlaceReferido:", error);
-      return res.status(500).json({ error: 'No se pudo generar el enlace de referido' });
+      return res.status(500).json({ error: "No se pudo generar el enlace o código de referido" });
     }
   },
-  
-RegistrarRelacionReferido: async (usuarioId) => {
+
+  RegistrarRelacionReferido: async (usuarioId) => {
 
     if (!usuarioId || !mongoose.Types.ObjectId.isValid(usuarioId)) {
       return null; // No crea relación si no hay referidor válido

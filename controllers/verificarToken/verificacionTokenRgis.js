@@ -5,34 +5,41 @@ import crypto from 'crypto';
 import envio from '../logica-email/envioClienteVeri.js';
 
 var registrousu = {
+
   verificarCorreo: async (req, res) => {
     try {
       const { token } = req.params;
+      const params = req.body;
+
+      // 1. Buscar usuario por token
       let usuario = await Regis.findOne({ tokenVerificacion: token }).populate("referido");
 
       if (!usuario) {
-        // 🚨 Token inválido o expirado → buscamos si hay alguien con reintentos pendientes
-        usuario = await Regis.findOne({ tokenVerificacion: null, verificado: false });
+        // 🚨 Caso: Token inválido o expirado → buscar usuario pendiente
+        usuario = await Regis.findOne({ verificado: false }).sort({ updatedAt: -1 }); // el último no verificado
         if (!usuario) {
           return res.status(400).json({ msg: "Token inválido o usuario no encontrado." });
         }
 
-        // Si ya alcanzó los 2 reintentos, bloquear
-        if (usuario.reintentosVerificacion >= 2) {
-          return res.status(400).json({ msg: "Límite de reintentos alcanzado. Contacte soporte." });
+        // 2. Validar reintentos
+        if (usuario.reintentosVerificacion >= 3) {
+          // 🔥 Eliminar documento definitivamente
+          await Regis.findByIdAndDelete(usuario._id);
+          return res.status(400).json({ msg: "Se superó el límite de reintentos. El registro fue eliminado, vuelve a intentarlo desde cero." });
         }
 
-        // Generar nuevo token
+        // 3. Generar nuevo token
         const nuevoToken = crypto.randomBytes(32).toString("hex");
         usuario.tokenVerificacion = nuevoToken;
         usuario.reintentosVerificacion += 1;
+        usuario.expireAt = Date.now() + 1000 * 60 * 60 * 24; // renueva 24h
         await usuario.save();
 
-        // Reenviar correo
+        // 4. Reenviar correo
         const url = `http://localhost:8080/api/verificar/${nuevoToken}`;
         await envio.sendMail({
-          from: "noreply@tuapp.com",
-          to: usuario.correo,
+          from: params.user,
+          to: params.correo,
           subject: "Reenvío de verificación de correo",
           text: `Hola ${usuario.nombre_cliente}, tu enlace anterior expiró. Verifica tu correo en: ${url}`
         });
@@ -40,15 +47,18 @@ var registrousu = {
         return res.status(400).json({ msg: "Token expirado, se envió un nuevo correo de verificación." });
       }
 
+      // 5. Usuario ya verificado → no permitir doble verificación
       if (usuario.verificado) {
         return res.status(400).json({ msg: "El usuario ya ha sido verificado anteriormente." });
       }
 
-      // ✅ Verificación exitosa
+      // ✅ 6. Verificación exitosa
       usuario.tokenVerificacion = null;
       usuario.verificado = true;
+      usuario.reintentosVerificacion = 0; // reset por si acaso
       await usuario.save();
 
+      // 7. Si hay un referido, asignar comisiones
       let mensajeExtra = "";
       if (usuario.referido) {
         const ok = await comissiones(usuario, usuario.referido);
