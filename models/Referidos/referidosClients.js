@@ -4,9 +4,24 @@ import moment from "moment-timezone";
 const Schema = mongoose.Schema;
 
 const RefeUsuSchema = new Schema({
-  usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: "RegisUsu" },
-  referralDate: { type: Date, default: () => moment().tz("America/Bogota").toDate() },
-  commissionLevel: { type: mongoose.Schema.Types.ObjectId, ref: "NvlRefe" },
+  usuarioId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RegisUsu"
+  },
+  // 👥 Usuario que usó ese código para registrarse (hijo)
+  referidoId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "RegisUsu",
+    default: null,
+  },
+  referralDate: {
+    type: Date,
+    default: () => moment().tz("America/Bogota").toDate()
+  },
+  commissionLevel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "NvlRefe"
+  },
   estado: {
     type: Boolean,
     default: false
@@ -16,15 +31,13 @@ const RefeUsuSchema = new Schema({
     type: String,
     unique: true
   }, // ✅ Índice único
-  
+
   codigoReferido: {
     type: String,
-    unique: true,
-    sparse: true,       // permite múltiples documentos sin código
-    uppercase: true,
-    trim: true,
-    default: null,      // deja claro que puede no existir
+    unique: true
   },
+  cicloActivo: { type: Boolean, default: true },
+  maxDepth: { type: Number, default: 0 },
 
   expireAt: {
     type: Date,

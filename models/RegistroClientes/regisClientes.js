@@ -81,8 +81,8 @@ const RegisUsuSchema = new Schema({
         default: false
     },
     generation: {
-        type: Number,
-        default: 0
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'NvlRefe',
     },
     reintentosVerificacion: {
         type: Number,
@@ -96,14 +96,7 @@ const RegisUsuSchema = new Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'refeClient',
     },
-    codigoReferido: {
-        type: String,
-        unique: true,
-        sparse: true,       // permite múltiples documentos sin código
-        uppercase: true,
-        trim: true,
-        default: null,      // de
-    },
+
 
 
     expireAt: {

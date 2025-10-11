@@ -43,9 +43,11 @@ var ArbolReferidos = {
       const padreId = req.usuario._id;
       const { commissionLevel } = req.params;
 
-      const nivelDoc = await NvlReferidos.findOne({ GeneracionLevel: Number(commissionLevel) - 1 });
+      const nivelDoc = await NvlReferidos.findOne({ GeneracionLevel: 0 });
       if (!nivelDoc) {
-        return res.status(404).json({ msg: "Nivel de comisión no encontrado" });
+        return res.status(500).json({
+          msg: "No se encontró el nivel Gen0 en la colección nivelReferido.",
+        });
       }
 
       const tokenVerificacionReferido = crypto.randomBytes(18).toString("base64url");

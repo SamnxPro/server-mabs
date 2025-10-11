@@ -6,8 +6,9 @@ import bcryptjs from "bcryptjs";
 import crypto from 'crypto';
 import envio from '../logica-email/envioClienteVeri.js'
 import RefeUsu from '../../models/Referidos/referidosClients.js';
+import nivelReferido from '../../models/Referidos/nivelReferido.js';
 
-const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
+//const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
 
 
 
@@ -49,11 +50,11 @@ var registrousu = {
             const params = req.body;
 
             // 1️⃣ Validar dominio de correo
-            if (!validarDominio(params.correo)) {
+         /*   if (!validarDominio(params.correo)) {
                 return res.status(400).json({
                     msg: "Correo electrónico inválido. Solo se permiten @hotmail.com, @gmail.com, @yahoo.com",
                 });
-            }
+            }*/
 
             // 2️⃣ Verificar si el correo ya existe
             let usuario = await Regis.findOne({ correo: params.correo });
@@ -116,6 +117,12 @@ var registrousu = {
                     });
                 }
             }
+            const nivelGen0 = await nivelReferido.findOne({ GeneracionLevel: 0 });
+            if (!nivelGen0) {
+                return res.status(500).json({
+                    msg: "No se encontró el nivel Gen0 en la colección nivelReferido.",
+                });
+            }
 
             // 4️⃣ Crear nuevo token y hash de password
             const tokenVerificacion = crypto.randomBytes(32).toString("hex");
@@ -131,6 +138,7 @@ var registrousu = {
                 telefono: params.telefono,
                 fecha_nacimiento: new Date(params.fecha_nacimiento),
                 rol: "CLIENTE",
+                generation: nivelGen0._id,
                 tokenVerificacion,
                 referido: referidoDoc ? referidoDoc._id : null,
                 codigoReferido: params.codigoReferido ? params.codigoReferido.toUpperCase() : null,

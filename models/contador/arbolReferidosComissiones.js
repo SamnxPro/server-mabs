@@ -17,15 +17,7 @@ const ContadorSchema = new Schema({
         required: true,
     },
 
-    montoFactu: {
-        type: Number,
-        default: 0
-    },
-
-    commissionLevel: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'NvlRefe'
-    },  // Nivel de la comisión (Gen0, Gen1, etc.)
+    
 
 
 
