@@ -1,14 +1,21 @@
-import nodemailer  from 'nodemailer'
+import { Resend } from 'resend';
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use `true` for port 465, `false` for all other ports
-    auth: {
-      user: "srjuandi800@gmail.com",
-      pass: "dmzq qwgl ovqj emdt"
-    },
-  });
 
-  // Exportar el transporter como el valor predeterminado (default)
-export default transporter;
+const resend = new Resend(process.env.RESEND_API_KEY);
+
+async function sendEmail() {
+  try {
+    const data = await resend.emails.send({
+      from: 'Pixeliado <onboarding@resend.dev>',
+      to: 'samnxpixel@gmail.com',
+      subject: 'Hello World',
+      html: '<p>Congrats on sending your <strong>first email</strong>!</p>',
+    });
+
+    console.log('✅ Correo enviado con éxito:', data);
+  } catch (error) {
+    console.error('❌ Error al enviar correo:', error);
+  }
+}
+
+sendEmail();
