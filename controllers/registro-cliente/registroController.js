@@ -80,8 +80,8 @@ var registrousu = {
                 usuario.expireAt = Date.now() + 1000 * 60 * 60 * 24; // +24h
                 await usuario.save();
 
-                const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
-                await envio.sendMail({
+                const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
+                await envio({
                     from: params.user,
                     to: params.correo,
                     subject: "Reintento de verificación",
@@ -155,8 +155,8 @@ var registrousu = {
             }
 
             // 7️⃣ Enviar correo de verificación
-            const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
-            await envio.sendMail({
+            const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
+            await envio({
                 from: params.user,
                 to: params.correo,
                 subject: "Verificación de correo electrónico",

@@ -16,8 +16,17 @@ const ContadorSchema = new Schema({
         ref: "refeClient",
         required: true,
     },
+    valorMembresia: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "MembresiaArbol",
+        required: true,
+    },
+    estadoFatura: {
+        type: Boolean,
+        default: true
+    },
 
-    
+
 
 
 

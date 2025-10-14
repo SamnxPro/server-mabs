@@ -37,6 +37,7 @@ const RefeUsuSchema = new Schema({
     unique: true
   },
   cicloActivo: { type: Boolean, default: true },
+  
   maxDepth: { type: Number, default: 0 },
 
   expireAt: {

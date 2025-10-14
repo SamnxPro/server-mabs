@@ -88,7 +88,7 @@ const referidoToken = {
       });
 
       // ✉️ Enviar correo de verificación
-      const url = `http://localhost:8080/api/verificar/${tokenVerificacion}`;
+      const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
       await envio.sendMail({
         from: "noreply@tuapp.com",
         to: nuevoUsuario.correo,

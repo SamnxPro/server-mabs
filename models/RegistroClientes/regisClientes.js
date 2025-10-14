@@ -97,13 +97,20 @@ const RegisUsuSchema = new Schema({
         ref: 'refeClient',
     },
 
-
+    cicloActivo: {
+    type: Boolean,
+    default: true, // Por defecto todos comienzan activos
+    },
 
     expireAt: {
         type: Date,
         default: () => moment().add(24, "hours").toDate(), // 24 horas
         index: { expires: 0 } // TTL: cuando llegue la fecha se elimina automático
-    }
+    },
+    fechaCierreCiclo: {
+        type: Date,
+        default: null, // Solo se llena cuando llega a Gen4
+    },
 
 
 });

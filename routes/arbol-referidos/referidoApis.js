@@ -14,6 +14,12 @@ import validarJwtReferidos from '../../middlewares/jwt-referidos/validar-jwt-ref
 
 var router = express.Router()
 
+
+router.get('/listarRefere/:userId',[
+    validarJWT
+    
+], ArbolReferidos.ListarReferidos )
+
 router.get('/enlace/:commissionLevel',[
     validarJWT
     

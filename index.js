@@ -8,6 +8,7 @@ import bodyParser from 'body-parser'
 import router from './routes/Registro/registroApis.js'
 import login from './routes/login/InicioSesion.js';
 import referidoApis from './routes/arbol-referidos/referidoApis.js'
+import rutasSeguridad from './routes/seguridad/rutas.js'
 import dot from 'dotenv'
 import fileUpload from 'express-fileupload'
 
@@ -50,6 +51,7 @@ app.use('/api', router)
 
 app.use('/api/referido', referidoApis)
 app.use('/api/login', login)
+app.use('/api/seguridad', rutasSeguridad)
 
 
 
@@ -72,6 +74,7 @@ io.on('connection', (socket)=>{
 
 //variables de entorno
 dot.config();
+
 
 
 

@@ -1,21 +1,32 @@
+// envioClienteVeri.js
 import { Resend } from 'resend';
-
+import dotenv from 'dotenv';
+dotenv.config();
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-async function sendEmail() {
+const envio = async ({ from, to, subject, text, html }) => {
   try {
+    if (!to || typeof to !== 'string') {
+      throw new Error(`El campo "to" debe ser un string. Valor recibido: ${to}`);
+    }
+
     const data = await resend.emails.send({
-      from: 'Pixeliado <onboarding@resend.dev>',
-      to: 'samnxpixel@gmail.com',
-      subject: 'Hello World',
-      html: '<p>Congrats on sending your <strong>first email</strong>!</p>',
+      from: "Pixeliado <onboarding@resend.dev>",
+      to: "samnxpixel@gmail.com", // tu correo
+      subject,
+      text,
+      html,
     });
 
-    console.log('✅ Correo enviado con éxito:', data);
+    if (data.error) {
+      console.error('❌ Error al enviar correo:', data.error);
+    } else {
+      console.log('✅ Correo enviado con éxito:', data);
+    }
   } catch (error) {
-    console.error('❌ Error al enviar correo:', error);
+    console.error('🚨 Error general en envioClienteVeri:', error.message);
   }
-}
+};
 
-sendEmail();
+export default envio;
