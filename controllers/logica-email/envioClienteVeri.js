@@ -1,14 +1,19 @@
-import nodemailer  from 'nodemailer'
+import nodemailer from "nodemailer";
+import dotenv from "dotenv";
+import dns from "dns";
+
+dns.setDefaultResultOrder("ipv4first"); // fuerza IPv4, evita errores EAI_AGAIN
+dotenv.config();
 
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true, // Use `true` for port 465, `false` for all other ports
-    auth: {
-      user: process.env.MAIL_USER, // generated ethereal user 
-      pass: process.env.MAIL_PASSWORD, // generated ethereal password
-    },
-  });
-
-  // Exportar el transporter como el valor predeterminado (default)
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // SSL
+  auth: {
+    user: process.env.MAIL_USER,
+    pass: process.env.MAIL_PASSWORD,
+  },
+});
+console.log("MAIL_USER:", process.env.MAIL_USER);
+console.log("MAIL_PASSWORD:", process.env.MAIL_PASSWORD ? "OK" : "MISSING");
 export default transporter;
