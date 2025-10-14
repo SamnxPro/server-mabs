@@ -1,32 +1,14 @@
-// envioClienteVeri.js
-import { Resend } from 'resend';
-import dotenv from 'dotenv';
-dotenv.config();
+import nodemailer  from 'nodemailer'
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true, // Use `true` for port 465, `false` for all other ports
+    auth: {
+      user: process.env.MAIL_USER, // generated ethereal user 
+      pass: process.env.MAIL_PASSWORD, // generated ethereal password
+    },
+  });
 
-const envio = async ({ from, to, subject, text, html }) => {
-  try {
-    if (!to || typeof to !== 'string') {
-      throw new Error(`El campo "to" debe ser un string. Valor recibido: ${to}`);
-    }
-
-    const data = await resend.emails.send({
-      from: "Pixeliado <onboarding@resend.dev>",
-      to: "samnxpixel@gmail.com", // tu correo
-      subject,
-      text,
-      html,
-    });
-
-    if (data.error) {
-      console.error('❌ Error al enviar correo:', data.error);
-    } else {
-      console.log('✅ Correo enviado con éxito:', data);
-    }
-  } catch (error) {
-    console.error('🚨 Error general en envioClienteVeri:', error.message);
-  }
-};
-
-export default envio;
+  // Exportar el transporter como el valor predeterminado (default)
+export default transporter;
