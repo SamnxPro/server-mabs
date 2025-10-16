@@ -25,6 +25,7 @@ const app = express()
 
 
 
+
 //Creamos el servidor con el modulo http
 const server = http.createServer(app)
 const io = new Socketserver(server,{
