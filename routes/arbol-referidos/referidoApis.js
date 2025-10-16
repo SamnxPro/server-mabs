@@ -25,7 +25,13 @@ router.get('/enlace/:commissionLevel',[
     
 ], ArbolReferidos.generarEnlaceReferido )
 
-router.post('/enlaceVer/:token',[
+router.post('/enlaceVer/:token',[ 
+    check('nombre_cliente', 'El nombre cliente es obligatoria').not().isEmpty(),
+    check('apellido', 'El apellido es obligatorio').not().isEmpty(),
+    check('correo', 'correo no es valido').isEmail(),
+    check('correo', ).custom(esCorreoValido),
+    check('password', 'contraseña no es valido').isLength({ min: 6}),
+    check('telefono', ' El telefono es obligatorio').not().isEmpty(),
     validarJwtReferidos
 ], verficacionRef.verificarReferido )
 

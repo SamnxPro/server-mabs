@@ -148,6 +148,7 @@ var registrousu = {
                 referido: referidoDoc ? referidoDoc._id : null,
                 codigoReferido: params.codigoReferido ? params.codigoReferido.toUpperCase() : null,
             });
+            console.log(password)
 
             const guardarApi = await registro.save();
 

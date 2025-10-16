@@ -1,15 +1,19 @@
 import mongoose from 'mongoose';
 import refere from '../../models/Referidos/referidosClients.js';
 import regis from '../../models/RegistroClientes/regisClientes.js';
-import envio from '../logica-email/envioClienteVeri.js';
+import { enviarCorreo } from "../logica-email/envioClienteVeri.js";
 import bcryptjs from 'bcryptjs';
 import crypto from 'crypto';
 import NvlReferidos from '../../models/Referidos/nivelReferido.js ';
+
+
+const MAIL_USER = process.env.MAIL_USER;
 
 const referidoToken = {
 
   verificarReferido: async (req, res) => {
     try {
+      const params = req.body;
       const usuarioHijoData = req.body;
       const referido = req.referidoRelacion; // el doc de refeClient obtenido del token
       const payloadRef = req.payloadRef;
@@ -89,11 +93,15 @@ const referidoToken = {
 
       // ✉️ Enviar correo de verificación
       const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
-      await envio.sendMail({
-        from: "noreply@tuapp.com",
-        to: nuevoUsuario.correo,
+      await enviarCorreo({
+        to: params.correo,
         subject: "Verificación de correo electrónico",
-        text: `Hola ${nuevoUsuario.nombre_cliente}, verifica tu correo en: ${url}`,
+        textContent: `Por favor verifica tu correo en: ${url}`,
+        htmlContent: `
+                <h2>Hola ${params.nombre_cliente || "Usuario"} 👋</h2>
+                <p>Por favor verifica tu correo haciendo clic en el siguiente enlace:</p>
+                <a href="${url}" target="_blank">${url}</a>
+            `,
       });
 
       return res.status(200).json({
