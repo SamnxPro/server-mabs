@@ -87,7 +87,7 @@ const RegisUsuSchema = new Schema({
     reintentosVerificacion: {
         type: Number,
         default: 0,
-        max: 2 // opcional, pero puedes usar lógica en controlador
+        //max: 2 // opcional, pero puedes usar lógica en controlador
     },
     tokenVerificacion: String,
     tokenRecuperacion: String,

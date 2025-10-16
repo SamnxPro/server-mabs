@@ -15,11 +15,18 @@ export  async function rolAdmin(rol = 'ADMINISTADOR') {
     }
 }
 export async function esCorreoValido(correo = '') {
-    // Verificar si el correo ya existe en la base de datos
-    const existeCorreo = await Regis.findOne({ correo });
+  // Busca el usuario por correo
+  const usuario = await Regis.findOne({ correo });
 
-    // Si el correo ya existe, lanzamos un error o mostramos un mensaje de alerta
-    if (existeCorreo) {
-        throw new Error(`El correo electrónico ${correo} ya está registrado en nuestra base de datos. Por favor, use otro correo.`);
-    }console.log(existeCorreo)
-} 
+  // Si no existe, todo bien
+  if (!usuario) return true;
+
+  // Si existe y está verificado, bloqueamos
+  if (usuario.verificado) {
+    throw new Error(`El correo electrónico ${correo} ya está registrado y verificado. Por favor, use otro correo.`);
+  }
+
+  // Si existe pero NO está verificado, lo dejamos pasar
+  // Esto permite que el flujo de reintentos se active después
+  return true;
+}

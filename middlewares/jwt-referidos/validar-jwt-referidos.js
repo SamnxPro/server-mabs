@@ -25,13 +25,9 @@ const validarJwtReferidos = async (req, res, next) => {
 
     // 2. Verificar JWT
     const payload = jwt.verify(decryptedToken, process.env.SECRETKEYREF);
-    console.log("✅ Payload desencriptado:", payload);
 
-    // 3. Buscar la relación en BD
-    console.log("🔍 Buscando relación con:", {
-      refTok: payload.refTok,
-      parentId: payload.parentId
-    });
+
+
 
     const relacion = await refered.findOne({
       tokenVerificacionReferido: payload.refTok,
@@ -39,7 +35,7 @@ const validarJwtReferidos = async (req, res, next) => {
       estado: false
     }).populate("usuarioId", "nombre_cliente correo estado");
 
-    console.log("📌 Relación encontrada:", relacion);
+
 
     if (!relacion) {
       return res.status(401).json({ msg: 'Token no válido o relación no encontrada' });

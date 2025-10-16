@@ -16,7 +16,7 @@ const validarJWT = async (req, res, next) => {
     const secretKey = process.env.SECRETKEY.padEnd(32, '0').substring(0, 32); // Asegurar que tenga 32 caracteres
     const iv = secretKey.substring(0, 16); // Los primeros 16 caracteres de la SECRETKEY se usarán como IV
 
-    console.log("Token recibido (cifrado):", token);
+    
 
     // **1. Desencriptar el token**
     const decipher = crypto.createDecipheriv(
@@ -28,11 +28,10 @@ const validarJWT = async (req, res, next) => {
     let decryptedToken = decipher.update(token, 'hex', 'utf8');
     decryptedToken += decipher.final('utf8');
 
-    console.log("JWT desencriptado:", decryptedToken);
 
     // **2. Verificar el JWT**
     const { uid } = jwt.verify(decryptedToken, process.env.SECRETKEY);
-    console.log("Payload JWT verificado:", uid);
+
 
     // **3. Validar si el UID existe en la base de datos**
     const registrosUsu = await registroAu.findById(uid);

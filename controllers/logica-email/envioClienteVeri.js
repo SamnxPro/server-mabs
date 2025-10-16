@@ -17,10 +17,6 @@ export async function enviarCorreo({ to, subject, htmlContent, textContent }) {
       subject,
       htmlContent: htmlContent || `<p>${textContent}</p>`,
     };
-
-    console.log("📨 Payload final enviado a Brevo:");
-    console.log(JSON.stringify(data, null, 2));
-
     const response = await axios.post("https://api.brevo.com/v3/smtp/email", data, {
       headers: {
         "api-key": BREVO_API_KEY,
@@ -28,8 +24,6 @@ export async function enviarCorreo({ to, subject, htmlContent, textContent }) {
         Accept: "application/json",
       },
     });
-
-    console.log("✅ Correo enviado correctamente:", response.data);
     return response.data;
   } catch (error) {
     console.error("❌ Error al enviar correo:", error.response?.data || error.message);

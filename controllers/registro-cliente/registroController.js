@@ -82,11 +82,15 @@ var registrousu = {
                 await usuario.save();
 
                 const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
-                await envio.sendMail({
-                    from: params.user,
+                await enviarCorreo({
                     to: params.correo,
-                    subject: "Reintento de verificación",
-                    text: `Reintenta verificar tu correo: ${url}`,
+                    subject: "Verificación de correo electrónico",
+                    textContent: `Por favor verifica tu correo en: ${url}`,
+                    htmlContent: `
+                <h2>Hola ${params.nombre_cliente || "Usuario"} 👋</h2>
+                <p>Por favor verifica tu correo haciendo clic en el siguiente enlace:</p>
+                <a href="${url}" target="_blank">${url}</a>
+            `,
                 });
 
                 return res.status(200).json({
