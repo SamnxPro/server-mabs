@@ -72,7 +72,7 @@ const referidoToken = {
         tokenVerificacion,
         estado: true,
       });
-
+      console.log(password)
       // 🔁 Actualizar relación padre-hijo
       await refere.findByIdAndUpdate(referido._id, {
         estado: true,
