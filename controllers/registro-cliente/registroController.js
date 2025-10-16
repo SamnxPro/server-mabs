@@ -4,13 +4,14 @@ import { generarJWT } from '../../helpers/generar-jwt-registros/generar-jwt.js';
 import nodemailer from 'nodemailer'
 import bcryptjs from "bcryptjs";
 import crypto from 'crypto';
-import envio from '../logica-email/envioClienteVeri.js'
+import { enviarCorreo } from "../logica-email/envioClienteVeri.js";
 import RefeUsu from '../../models/Referidos/referidosClients.js';
 import nivelReferido from '../../models/Referidos/nivelReferido.js';
 
 //const dominiosPermitidos = ['hotmail.com', 'gmail.com', 'yahoo.com'];
 
 
+const MAIL_USER = process.env.MAIL_USER;
 
 const validarDominio = (correo) => {
     const dominio = correo.split('@')[1];
@@ -50,11 +51,11 @@ var registrousu = {
             const params = req.body;
 
             // 1️⃣ Validar dominio de correo
-         /*   if (!validarDominio(params.correo)) {
-                return res.status(400).json({
-                    msg: "Correo electrónico inválido. Solo se permiten @hotmail.com, @gmail.com, @yahoo.com",
-                });
-            }*/
+            /*   if (!validarDominio(params.correo)) {
+                   return res.status(400).json({
+                       msg: "Correo electrónico inválido. Solo se permiten @hotmail.com, @gmail.com, @yahoo.com",
+                   });
+               }*/
 
             // 2️⃣ Verificar si el correo ya existe
             let usuario = await Regis.findOne({ correo: params.correo });
@@ -156,11 +157,15 @@ var registrousu = {
 
             // 7️⃣ Enviar correo de verificación
             const url = `${process.env.PUBLIC_BASE_URL}/api/verificar/${tokenVerificacion}`;
-            await envio.sendMail({
-                from: params.user,
+            await enviarCorreo({
                 to: params.correo,
                 subject: "Verificación de correo electrónico",
-                text: `Por favor verifica tu correo en: ${url}`,
+                textContent: `Por favor verifica tu correo en: ${url}`,
+                htmlContent: `
+                <h2>Hola ${params.nombre_cliente || "Usuario"} 👋</h2>
+                <p>Por favor verifica tu correo haciendo clic en el siguiente enlace:</p>
+                <a href="${url}" target="_blank">${url}</a>
+            `,
             });
 
             // 8️⃣ Respuesta final
