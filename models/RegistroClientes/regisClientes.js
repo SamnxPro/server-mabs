@@ -42,10 +42,9 @@ const RegisUsuSchema = new Schema({
         required: true,
     },
     rol: {
-        type: String,
-        required: true,
-        default: 'USUARIO',
-        emun: ['VENDEDOR', 'CLIENTE']
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'roles', // Nombre de tu modelo de usuarios
+        required: true
     },
 
     estado: {
@@ -98,8 +97,8 @@ const RegisUsuSchema = new Schema({
     },
 
     cicloActivo: {
-    type: Boolean,
-    default: true, // Por defecto todos comienzan activos
+        type: Boolean,
+        default: true, // Por defecto todos comienzan activos
     },
 
     expireAt: {
